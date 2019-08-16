@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <h1>注册账号</h1>
+  username: <input type="text" id="username" onblur="check();"><span id="check"></span><br>
+
+  password: <input type="password" id="password"><br>
+
+  <button onclick="regist();">注册</button>
+  已有账号？点击<a href="/toLogin">登录</a>
+  
+  <script src="/js/jquery.min.js"></script>
+  <script>
+    // check方法：发送ajax请求，由服务器判断用户名是否可用
+    function check(){
+      var username = $('#username').val().trim();
+      if(username==''||username==undefined){
+        return ;
+      }
+      // 发送ajax
+      $.ajax({
+        url:'/checkName?username='+username,
+        success:function(res){
+          // 根据服务器传递回来的数据来处理
+          if(res.status==0){
+            $('#check').html(res.msg).css('color','blue');
+          }
+          if(res.status==1){
+            $('#check').html(res.msg).css('color','red');
+          }
+          if(res.status==2){
+            $('#check').html('');
+            alert(res.msg);
+          }
+        }
+      })
+    }
+    // 点击注册
+    function regist(){
+      var username = $('#username').val().trim();
+      var password = $('#password').val().trim();
+      // console.log(username,password);
+      if(password=='' || password==undefined){
+        alert('密码不能为空');
+        return ;
+      }
+      var data = {username:username,password:password};
+      $.ajax({
+        url:'/regist',
+        data:data,
+        success: function(res){
+          if(res.status==0){
+            // 注册成功，跳转到首页
+            location.href = '/';
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

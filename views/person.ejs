@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>个人中心</title>
+  <style>
+    #d1,#d2{
+      float: left;
+    }
+    #d1{
+      width: 100px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 需要的数据：用户名，头像，昵称，密码 -->
+  <div id="d1">
+    <a href="/toUpload"><img src="<%= p.photo %>"  width="100px"></a>
+  </div>
+  <div id="d2">
+    <div>
+      用户名：<%= p.username %>
+    </div>
+    <div>
+      昵称：<span><%= p.nickname||'(无)' %></span>
+      <a href="javascript:;" onclick="fn();">修改</a>
+    </div>
+    <div>
+      <a href="/toUpdatePwd">修改密码</a>
+    </div>
+  </div>
+  <script src="/js/jquery.min.js"></script>
+  <script>
+    function fn(){
+      var val = $('span').html(); // 获取span的内容
+      // 判断val是不是一个input
+      if(val.startsWith('<input')){
+        // 将其还原为昵称
+        val = '<%= p.nickname %>';
+      }
+      var input = $('<input >');
+      input.attr('type','text');
+      input.attr('placeholder',val);
+      input.attr('onblur','send()');
+      $('span').html(input);
+    }
+    function send(){
+      // 发送请求，修改数据库中的昵称
+      var val = $('input').val().trim();
+      if(val==''||val==undefined){
+        // alert('昵称不能空');
+        return ;
+      }
+      $.ajax({
+        url:'/checkNickname?nickname='+val,
+        success: function(res){
+          if(res.status==1){
+            alert(res.msg);
+            return ;
+          }
+          if(res.status==0){
+            alert(res.msg);
+            // 替换原来的input
+            $('span').html(val);
+          }
+        }
+      })
+    }
+  </script>
+</body>
+</html>

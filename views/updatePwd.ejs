@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <form action="/updatePwd" method="POST">
+    旧密码：&nbsp;
+    <input type="password" name="password"><br>
+    新密码：&nbsp;
+    <input type="password" name="nPwd" id="nPwd"><br>
+    确认密码：
+    <input type="password" id="pwd" oninput="check();"><span id="s2"></span><br>
+    <input type="submit" value="修改">
+  </form>
+</body>
+<script src="/js/jquery.min.js"></script>
+<script>
+  function check(){
+    var nPwd = $('#nPwd').val().trim();
+    var pwd = $('#pwd').val().trim();
+    if(nPwd!=pwd){
+      $('#s2').html('密码不一致').css('color','red');
+      return ;
+    }
+    // 输入一致
+    $('#s2').html('');
+  }
+</script>
+</html>

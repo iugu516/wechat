@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>****留言板****</title>
+  <style>
+    body{
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+    }
+    form,h1{
+      margin-left: 100px;
+    }
+    ul{
+      list-style: none;
+    }
+    li{
+      padding-right: 100px;
+      padding-left: 50px;
+    }
+    #person{
+      float: right;
+      padding-right: 100px;
+    }
+  </style>
+</head>
+<body>
+  <a href="/personCenter" id="person">个人中心</a>
+  <h1>留言板</h1>
+  <form action="/add">
+    <h3>
+      <%for(var i=0;i<users.length;i++){%>
+        <%if(users[i].username==username){%>
+          <img src="<%=users[i].photo%>" width="20px">
+          <%= users[i].nickname || username %>
+          <%break ;%>
+        <%}%>
+      <%}%>
+    </h3>
+    留言： <textarea name="message"></textarea><br>
+    <input type="submit" value="留言">
+    <a href="/logout">退出登录</a>
+  </form>
+  <hr>
+  <ul>
+    <% for(var i=0;i<msg.length;i++){ %>
+    <li>
+      <div>
+        <% for(var j=0;j<users.length;j++){ %>
+          <% if(users[j].username==msg[i].username){ %>
+            <img src="<%=users[j].photo%>" width="20px">
+          <% } %>
+        <% } %>
+        <%= msg[i].nickname %></div>
+      <div><%= msg[i].message %></div>
+      <div><%= msg[i].time %></div>
+      <% if(username==msg[i].username){ %>
+      <div>
+        <a href="javascript:;" onclick="modify(this)">修改</a>
+        <a href="/del?id=<%= msg[i]._id %>">删除</a>
+      </div>
+      <% } %>
+      <hr>
+    </li>
+    <% } %>
+  </ul>
+  <script src="/js/jquery.min.js"></script>
+</body>
+<script>
+  function modify(e){
+    // console.log($(e).parent().prev().prev().html())
+    var msgDiv = $(e).parent().prev().prev();
+    var msg = msgDiv.html();
+    if(msg.startsWith('<input')){
+      msg = msgDiv.children('input').val();
+      // console.log(msg);
+      if(msg.trim()==''||msg==undefined){
+        msg = msgDiv.children('input').attr('placeholder');
+        // console.log(msg);
+      }
+    }
+    var $input = $('<input>');
+    $input.attr('type','text');
+    $input.attr('placeholder',msg);
+    var $idDiv = $(e).next();
+    var href = $idDiv.attr('href');
+    var arr = href.split('=');
+    var id = arr[arr.length-1]; // 被点击修改信息所对应的_id值
+    $input.attr('onblur','send("'+id+'",this)');
+    // msgDiv.html('');
+    msgDiv.html($input);
+  }
+  function send(id,temp){
+    // alert(id);
+    if(!temp.value.trim()){
+      // alert('留言不能为空');
+      return;
+    }
+    var data = {id:id,val:temp.value};
+    $.ajax({
+      url:'/modify',
+      data:data,
+      success:function(res){
+        // console.log(res,$(temp));
+        if(res=='success'){
+          // alert('修改成功');
+          $(temp).parent().html(temp.value);
+        }else{
+          alert('修改失败');
+        }
+      }
+    })
+  }
+</script>
+</html>
